@@ -1,3 +1,4 @@
+//エントリー情報を一覧表示するシート作成関数
 function createEntryInfo([choice_col,sheetName]) {
   const iss = mss.getSheetByName('エントリー情報');
   var junreNumCol = choice_col - 2;
