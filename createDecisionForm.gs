@@ -3,7 +3,8 @@
   const joinNums_col = 5;
 
 /*
-  第1次コマ生決定フォーム作成、振り分け準備関数
+  第1次メンバー決定フォーム作成、振り分け準備関数
+  フォーム作成
 */
 function setupFirstDecisionForm() {
   var Properties = PropertiesService.getScriptProperties();
@@ -23,19 +24,19 @@ function setupFirstDecisionForm() {
 
     //フォーム作成
     var idList = [];
-    var folder1 = create_parentsFile("1次コマ生決定フォーム");
-    var folder2 = create_parentsFile("2次コマ生決定フォーム");
+    var folder1 = create_parentsFile("1次メンバー決定フォーム");
+    var folder2 = create_parentsFile("2次メンバー決定フォーム");
     var formList = {};
     for(var i=0;i<junreList.length;i++){
-      formList[junreList[i]] = FormApp.create(junreList[i] + "　1次コマ生決定フォーム")
-          .setTitle(junreList[i] + "　1次コマ生決定フォーム")
+      formList[junreList[i]] = FormApp.create(junreList[i] + "　1次メンバー決定フォーム")
+          .setTitle(junreList[i] + "　1次メンバー決定フォーム")
           .setAllowResponseEdits(true)
           .setConfirmationMessage("フォームを送信しました。");
       //フォルダに移動
       move_file(formList[junreList[i]],folder1);
 
-      var secondform = FormApp.create(junreList[i] + "　2次コマ生決定フォーム")
-          .setTitle(junreList[i] + "　2次コマ生決定フォーム")
+      var secondform = FormApp.create(junreList[i] + "　2次メンバー決定フォーム")
+          .setTitle(junreList[i] + "　2次メンバー決定フォーム")
           .setAllowResponseEdits(true)
           .setConfirmationMessage("フォームを送信しました。");
       //フォルダに移動
@@ -69,12 +70,14 @@ function setupFirstDecisionForm() {
 }
 
 /*
-  第1次コマ生決定フォーム　振り分け関数
+  第1次メンバー決定フォーム　振り分け関数
+  エントリー情報をフォームに回答として振り分ける
 */
 function sortFirstDecisionForm() {
   var Properties = PropertiesService.getScriptProperties();
   var sortStatus = parseInt(Properties.getProperty("sortStatus"));
-
+  
+  //準備が終わっているかの確認
   if(sortStatus == 1){
     var status = parseInt(Properties.getProperty("status"));
     var sttime = new Date();
@@ -85,6 +88,7 @@ function sortFirstDecisionForm() {
     var choice_array = entry_sort.getRange(2,choice_col,lastRow-1,hearJunreNum*2).getValues();
     var nameAndChoice_array = [];
 
+    //エントリー情報を取得
     if(junreMax > 1){
       var wishJoinNum_array = entry_sort.getRange(2,choice_col-1,lastRow-1,1).getValues();
       for(var i=0; i<name_array.length;i++){
@@ -97,6 +101,7 @@ function sortFirstDecisionForm() {
       }
     }
     
+    //ジャンルそれぞれのフォームを管理する関数
     if(status != 1){
       var formList = {};
       var idList = JSON.parse(Properties.getProperty("idList"));
@@ -116,6 +121,7 @@ function sortFirstDecisionForm() {
       k = parseInt(Properties.getProperty("k"));
     }
 
+    //回答情報を１から参照していく
     for(i;i<(junreMax*2);i+=2){
       console.log("i="+i);
       if(status != 1){
@@ -146,12 +152,13 @@ function sortFirstDecisionForm() {
           }         
         }
         for(var t=0;t<junreList.length;t++){
+          //回答の希望先ジャンルのメンバー決定フォームに回答を作成する
           if(nameAndChoice_array[k][i+2] == junreList[t]){
             if(i==0){
               var q_decision = formList[junreList[t]].addMultipleChoiceItem();
               q_decision.setTitle("第1希望 - " + nameAndChoice_array[k][0] + " / " + nameAndChoice_array[k][1])
                 .setHelpText("意気込み : " + nameAndChoice_array[k][i+3])
-                .setChoiceValues(["コマ生にする","保留","落とす"])
+                .setChoiceValues(["メンバーにする","保留","落とす"])
                 .setRequired(true);
               idList[t].push(k);
             }else if(i>0){
@@ -160,7 +167,7 @@ function sortFirstDecisionForm() {
                 var q_decision = formList[junreList[t]].addMultipleChoiceItem();
                 q_decision.setTitle("第" + wn + "希望 - " + nameAndChoice_array[k][0] + " / " + nameAndChoice_array[k][1])
                   .setHelpText("意気込み : " + nameAndChoice_array[k][i+3])
-                  .setChoiceValues(["コマ生にする","保留","落とす"])
+                  .setChoiceValues(["メンバーにする","保留","落とす"])
                   .setRequired(true);
                 idList[t].push(k);
               }
@@ -186,18 +193,20 @@ function sortFirstDecisionForm() {
     Properties.deleteProperty("idList");
 
     Properties.setProperty("sortStatus",2);
-    Browser.msgBox( "第1次コマ生決定フォームを作成しました。振付にURLを共有してください。", Browser.Buttons.OK);
+    Browser.msgBox( "第1次メンバー決定フォームを作成しました。振付にURLを共有してください。", Browser.Buttons.OK);
   }else{
     Browser.msgBox( "振り分けが開始されていないか、順番が間違っています。", Browser.Buttons.OK);
   }
   
 }
 /*
-  第2次以降コマ生振り分け実行関数
+  第2次以降メンバー振り分けを実行する関数
 */
 function runSortNextDecisionForm(){
   var Properties = PropertiesService.getScriptProperties();
   var sortStatus = parseInt(Properties.getProperty("sortStatus"));
+  
+  //1次振り分けが終わっているかの確認
   if(sortStatus == 2){
     var status = parseInt(Properties.getProperty("status"));
     var sttime = new Date();
@@ -246,7 +255,7 @@ function runSortNextDecisionForm(){
     Properties.deleteProperty("formidLists");
 
     Properties.setProperty("sortStatus",3);
-    Browser.msgBox( "コマ生決定フォームを更新しました。振付にURLを共有してください。", Browser.Buttons.OK);
+    Browser.msgBox( "メンバー決定フォームを更新しました。振付にURLを共有してください。", Browser.Buttons.OK);
   }else{
     Browser.msgBox( "振り分けが開始されていないか、順番が間違っています。", Browser.Buttons.OK);
   }
@@ -255,7 +264,7 @@ function runSortNextDecisionForm(){
 }
 
 /*
-  第2次以降コマ生決定フォーム読み込み、振り分け関数(ジャンルごと)
+  第2次以降メンバー決定フォーム読み込み、振り分け関数(ジャンルごと)
 */
 function sortNextDecision(formId) {
   const nlss = mss.getSheetByName('名簿');
@@ -332,8 +341,8 @@ function sortNextDecision(formId) {
     let name_id = name_idList[i];
     console.log(name_id);
 
-    //コマ生にする人の場合
-    if(itemResp[i].getResponse() == "コマ生にする"){
+    //メンバーにする人の場合
+    if(itemResp[i].getResponse() == "メンバーにする"){
       let value = decisionStatuses[name_id][2];
       //まだそのジャンルに参加していなかった場合
       if(value.indexOf(junre) == -1 ){
@@ -353,7 +362,7 @@ function sortNextDecision(formId) {
       var q_decision = secondDecisionForm.addMultipleChoiceItem();
       q_decision.setTitle(itemResp[i].getItem().getTitle())
                 .setHelpText(itemResp[i].getItem().getHelpText())
-                .setChoiceValues(["コマ生にする","保留","落とす"])
+                .setChoiceValues(["メンバーにする","保留","落とす"])
                 .setRequired(true);
       new_idLists.push(name_idList[i]);
     //落とす人の場合
@@ -394,7 +403,7 @@ function sortNextDecision(formId) {
               var q_decision = nextJunreDecisionForm.addMultipleChoiceItem();
               q_decision.setTitle(title)
                         .setHelpText(helptext)
-                        .setChoiceValues(["コマ生にする","保留","落とす"])
+                        .setChoiceValues(["メンバーにする","保留","落とす"])
                         .setRequired(true);
               
               name_idLists[t].push(name_idList[i]);
@@ -410,7 +419,7 @@ function sortNextDecision(formId) {
   //スプレッドシートに記入  
   nlss.getRange(2,joinNums_col,lastRow_nlss-1,3).setValues(decisionStatuses);
 
-  //サーバーに次のコマ生決定フォームIDリスト(new_idList)をappendRowする 4/21
+  //サーバーに次のメンバー決定フォームIDリスト(new_idList)をappendRowする 4/21
   server.deleteRow(3+server_row);
   server.appendRow(new_idLists);
 
@@ -418,7 +427,7 @@ function sortNextDecision(formId) {
 }
 
 /*
-  次のコマ生決定フォームの準備関数
+  次のメンバー決定フォームの準備関数
 */
 function setupNextDecision() {
     var Properties = PropertiesService.getScriptProperties();
@@ -442,13 +451,13 @@ function setupNextDecision() {
         //3次以降決定フォームを作成   
         var decisionForm_title = secondDecisionForm.getTitle();
         var decision_count = Number(decisionForm_title.substring(decisionForm_title.indexOf("　")+1,decisionForm_title.indexOf("　")+2)) + 1;
-        var next_DecisionForm = FormApp.create(junre + "　"+ decision_count +"次コマ生決定フォーム")
-                                    .setTitle(junre + "　"+ decision_count +"次コマ生決定フォーム")
+        var next_DecisionForm = FormApp.create(junre + "　"+ decision_count +"次メンバー決定フォーム")
+                                    .setTitle(junre + "　"+ decision_count +"次メンバー決定フォーム")
                                     .setAllowResponseEdits(true)
                                     .setConfirmationMessage("フォームを送信しました。");
         //3次以降決定フォームの親フォルダへ移動
         if(i == 0){
-          var folder = create_parentsFile(decision_count + "次コマ生決定フォーム");
+          var folder = create_parentsFile(decision_count + "次メンバー決定フォーム");
           move_file(next_DecisionForm, folder);
         }else{
           move_file(next_DecisionForm, folder);
@@ -533,7 +542,7 @@ function resetDecision() {
 }
 
 
-//ジャンルごとのコマ生決定フォームの表作成関数
+//ジャンルごとのメンバー決定フォームの表作成関数
 function urltableCreate(idLists) {
   const dm_ss = mss.getSheetByName('エントリー振り分け');
   //提出確認欄のリセット
@@ -598,9 +607,6 @@ function endDecisionMember() {
 }
 
 
-/*
-  ----------------以下省略----------------------------
-*/
 function setTrigger(triggerKey, funcName){
   //既に同名で保存しているトリガーがあったら削除
   deleteTrigger(triggerKey);
