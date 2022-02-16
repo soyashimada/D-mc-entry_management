@@ -7,18 +7,22 @@
 
 ## エントリーを振り分けする流れ
 １．エントリーフォームの作成。  
-[(CreateEntryForm.gs)](https://github.com/soyashimada/D-mc-entry_management/blob/main/createEntryForm.gs)  
+ - [CreateEntryForm.gs](https://github.com/soyashimada/D-mc-entry_management/blob/main/createEntryForm.gs)  
 
 ２．ジャンルごとのメンバー決定フォームの作成。  
-[(createDecisionForm.gs/setupFirstDecisionForm())](https://github.com/soyashimada/D-mc-entry_management/blob/main/createDecisionForm.gs#L9)  
+ - [createDecisionForm.gs/setupFirstDecisionForm()](https://github.com/soyashimada/D-mc-entry_management/blob/main/createDecisionForm.gs#L9)  
 
 ３．フォーム回答から参加可能ジャンル数分の希望を読込。  
 ４．希望されているジャンルの決定フォームに、希望者を質問にして入れる。  
-[(createDecisionForm.gs/sortFirstDecisionForm())](https://github.com/soyashimada/D-mc-entry_management/blob/main/createDecisionForm.gs#L76)  
+ - [createDecisionForm.gs/sortFirstDecisionForm()](https://github.com/soyashimada/D-mc-entry_management/blob/main/createDecisionForm.gs#L76)  
 
 ５．振付が決定フォームを回答、入れたいメンバーを決定。  
 
 ６．決定フォームの回答を読込。  
 ７．選ばれた希望者はシートに記録。選ばれなければ次の希望を読み込み次の決定フォームに質問を作成。  
 ＜５～７を希望がすべて読み込めるまで繰り返す＞  
-[(createDecisionForm.gs/runSortNextDecisionForm())](https://github.com/soyashimada/D-mc-entry_management/blob/main/createDecisionForm.gs#L205)  
+ - [createDecisionForm.gs/runSortNextDecisionForm()](https://github.com/soyashimada/D-mc-entry_management/blob/main/createDecisionForm.gs#L205)  
+
+##  その他機能
+・エントリー一覧作成機能 - [createEntoryInfo.gs](https://github.com/soyashimada/D-mc-entry_management/blob/main/createEntryInfo.gs)　　
+・ジャンル名簿pdf作成機能 - [createpdf.gs](https://github.com/soyashimada/D-mc-entry_management/blob/main/createpdf.gs.gs)
